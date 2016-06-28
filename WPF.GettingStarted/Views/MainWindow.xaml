@@ -7,19 +7,36 @@
               ResizeMode="CanResize">
 
     <catel:StackGrid>
+        <catel:StackGrid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </catel:StackGrid.RowDefinitions>
         <catel:StackGrid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="100" />
         </catel:StackGrid.ColumnDefinitions>
 
-        <ListBox x:Name="listBox" ItemsSource="{Binding Families}" SelectedItem="{Binding SelectedFamily}">
+        <catel:StackGrid Grid.ColumnSpan="2">
+            <catel:StackGrid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </catel:StackGrid.ColumnDefinitions>
+
+            <Label Content="Filter:" />
+            <TextBox Text="{Binding SearchFilter}">
+                <i:Interaction.Behaviors>
+                    <catel:UpdateBindingOnTextChanged UpdateDelay="500" />
+                </i:Interaction.Behaviors>
+            </TextBox>
+        </catel:StackGrid>
+
+        <ListBox x:Name="listBox" ItemsSource="{Binding FilteredFamilies}" SelectedItem="{Binding SelectedFamily}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid>
                         <i:Interaction.Behaviors>
                             <catel:DoubleClickToCommand Command="{Binding ElementName=listBox, Path=DataContext.EditFamily}" />
                         </i:Interaction.Behaviors>
-
                         <views:FamilyView DataContext="{Binding}" />
                     </Grid>
                 </DataTemplate>

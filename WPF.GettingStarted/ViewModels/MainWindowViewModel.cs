@@ -1,11 +1,13 @@
 ﻿namespace WPF.GettingStarted.ViewModels
 {
     using Catel;
+    using Catel.Collections;
     using Catel.Data;
     using Catel.IoC;
     using Catel.MVVM;
     using Catel.Services;
     using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Threading.Tasks;
     using WPF.GettingStarted.Models;
     using WPF.GettingStarted.Services.Interfaces;
@@ -36,6 +38,7 @@
         #endregion
 
         #region Properties
+
         public override string Title { get { return "WPF.GettingStarted"; } }
 
         // TODO: Register models with the vmpropmodel codesnippet
@@ -69,6 +72,35 @@
         /// Register the SelectedFamily property so it is known in the class.
         /// </summary>
         public static readonly PropertyData SelectedFamilyProperty = RegisterProperty("SelectedFamily", typeof(Family), null);
+
+        /// <summary>
+        /// Gets the filtered families.
+        /// </summary>
+        public ObservableCollection<Family> FilteredFamilies
+        {
+            get { return GetValue<ObservableCollection<Family>>(FilteredFamiliesProperty); }
+            private set { SetValue(FilteredFamiliesProperty, value); }
+        }
+
+        /// <summary>
+        /// Register the FilteredFamilies property so it is known in the class.
+        /// </summary>
+        public static readonly PropertyData FilteredFamiliesProperty = RegisterProperty("FilteredFamilies", typeof(ObservableCollection<Family>));
+
+        /// <summary>
+        /// Gets or sets the search filter.
+        /// </summary>
+        public string SearchFilter
+        {
+            get { return GetValue<string>(SearchFilterProperty); }
+            set { SetValue(SearchFilterProperty, value); }
+        }
+
+        /// <summary>
+        /// Register the SearchFilter property so it is known in the class.
+        /// </summary>
+        public static readonly PropertyData SearchFilterProperty = RegisterProperty("SearchFilter", typeof(string), null, (sender, e) => ((MainWindowViewModel)sender).UpdateSearchFilter());
+
         #endregion
 
         #region Commands
@@ -90,6 +122,7 @@
             if (await _uiVisualizerService.ShowDialogAsync(familyWindowViewModel) ?? false)
             {
                 Families.Add(family);
+                UpdateSearchFilter();
             }
         }
 
@@ -148,12 +181,15 @@
         #endregion
 
         #region Methods
+
         protected override async Task InitializeAsync()
         {
             await base.InitializeAsync();
 
             var families = _familyService.LoadFamilies();
             Families = new ObservableCollection<Family>(families);
+
+            UpdateSearchFilter();
         }
 
         protected override async Task CloseAsync()
@@ -162,6 +198,30 @@
 
             await base.CloseAsync();
         }
+
+        /// <summary>
+        /// Updates the filtered items.
+        /// </summary>
+        private void UpdateSearchFilter()
+        {
+            if (FilteredFamilies == null)
+            {
+                FilteredFamilies = new ObservableCollection<Family>();
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchFilter))
+            {
+                FilteredFamilies.ReplaceRange(Families);
+            }
+            else
+            {
+                var lowerSearchFilter = SearchFilter.ToLower();
+                FilteredFamilies.ReplaceRange(from family in Families
+                                              where !string.IsNullOrWhiteSpace(family.FamilyName) && family.FamilyName.ToLower().Contains(lowerSearchFilter)
+                                              select family);
+            }
+        }
+        
         #endregion
     }
 }
