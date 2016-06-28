@@ -9,6 +9,8 @@ namespace WPF.GettingStarted.Models
     using Catel.Data;
     public class Person : ModelBase
     {
+        #region Properties
+                
         /// <summary>
         /// Gets or sets the first name.
         /// </summary>
@@ -36,7 +38,10 @@ namespace WPF.GettingStarted.Models
         /// Register the LastName property so it is known in the class.
         /// </summary>
         public static readonly PropertyData LastNameProperty = RegisterProperty("LastName", typeof(string), null);
+        #endregion
 
+        #region Methods
+        
         public override string ToString()
         {
             string fullName = string.Empty;
@@ -54,5 +59,20 @@ namespace WPF.GettingStarted.Models
             }
             return fullName;
         }
+
+        protected override void ValidateFields(List<IFieldValidationResult> validationResults)
+        {
+            if (string.IsNullOrWhiteSpace(FirstName))
+            {
+                validationResults.Add(FieldValidationResult.CreateError(FirstNameProperty, "The first name is required"));
+            }
+
+            if (string.IsNullOrWhiteSpace(LastName))
+            {
+                validationResults.Add(FieldValidationResult.CreateError(LastNameProperty, "The last name is required"));
+            }
+        }
+
+        #endregion
     }
 }

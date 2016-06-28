@@ -10,6 +10,9 @@ namespace WPF.GettingStarted.Models
     using System.Collections.ObjectModel;
     public class Family : ModelBase
     {
+
+        #region Properties
+                
         /// <summary>
         /// Gets or sets the family name.
         /// </summary>
@@ -38,9 +41,24 @@ namespace WPF.GettingStarted.Models
         /// </summary>
         public static readonly PropertyData PersonsProperty = RegisterProperty("Persons", typeof(ObservableCollection<Person>), () => new ObservableCollection<Person>());
 
+        #endregion
+
+        #region Methods
+
         public override string ToString()
         {
             return FamilyName;
         }
+
+        protected override void ValidateFields(List<IFieldValidationResult> validationResults)
+        {
+            if (string.IsNullOrWhiteSpace(FamilyName))
+            {
+                validationResults.Add(FieldValidationResult.CreateError(FamilyNameProperty, "The family name is required"));
+            }
+        }
+
+        #endregion
+        
     }
 }
