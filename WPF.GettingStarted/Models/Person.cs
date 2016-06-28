@@ -10,7 +10,7 @@ namespace WPF.GettingStarted.Models
     public class Person : ModelBase
     {
         #region Properties
-                
+
         /// <summary>
         /// Gets or sets the first name.
         /// </summary>
@@ -41,7 +41,7 @@ namespace WPF.GettingStarted.Models
         #endregion
 
         #region Methods
-        
+
         public override string ToString()
         {
             string fullName = string.Empty;
